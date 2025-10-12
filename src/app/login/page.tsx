@@ -34,7 +34,6 @@ export default function LoginPage() {
           </div>
           <Button
             onClick={handleGoogleSignIn}
-            variant="outline"
             className="w-full h-12"
             size="lg"
           >

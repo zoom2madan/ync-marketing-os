@@ -149,7 +149,7 @@ export function BulkActions({
       {isAdmin && (
         <Dialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
           <DialogTrigger asChild>
-            <Button disabled={disabled} variant="outline" size="sm">
+            <Button disabled={disabled} size="sm">
               <UserPlus className="h-4 w-4 mr-2" />
               Assign
             </Button>
@@ -198,7 +198,7 @@ export function BulkActions({
 
       <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
         <DialogTrigger asChild>
-          <Button disabled={disabled} variant="outline" size="sm">
+          <Button disabled={disabled} size="sm">
             <RefreshCw className="h-4 w-4 mr-2" />
             Update Status
           </Button>
@@ -246,7 +246,6 @@ export function BulkActions({
 
       <Button
         disabled={disabled}
-        variant="outline"
         size="sm"
         onClick={handleExport}
       >

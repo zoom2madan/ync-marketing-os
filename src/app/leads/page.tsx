@@ -183,7 +183,6 @@ export default function LeadsPage() {
             </span>
             <div className="flex gap-1">
               <Button
-                variant="outline"
                 size="icon"
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page <= 1}
@@ -191,7 +190,6 @@ export default function LeadsPage() {
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <Button
-                variant="outline"
                 size="icon"
                 onClick={() => handlePageChange(page + 1)}
                 disabled={page >= pagination.totalPages}

@@ -61,7 +61,7 @@ export function LeadDetailActions({ leadId, lead, tab }: LeadDetailActionsProps)
     return (
       <>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => handleOpenDialog("lead")}>
+          <Button size="sm" onClick={() => handleOpenDialog("lead")}>
             <Edit className="h-4 w-4 mr-2" />
             Edit Lead
           </Button>
