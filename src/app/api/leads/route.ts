@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/middleware";
 import { getLeads } from "@/lib/db/queries";
-import type { LeadFilters } from "@/types";
+import type { LeadFilters, LeadStage } from "@/types";
 
 export async function GET(request: NextRequest) {
   const authResult = await requireAuth();
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   const filters: LeadFilters = {};
   
   if (searchParams.get("stage")) {
-    filters.stage = searchParams.get("stage") as any;
+    filters.stage = searchParams.get("stage") as LeadStage;
   }
   if (searchParams.get("platform")) {
     filters.platform = searchParams.get("platform")!;

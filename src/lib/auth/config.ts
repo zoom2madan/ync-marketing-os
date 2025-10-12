@@ -10,7 +10,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       // Restrict to @yournextcampus.com domain only
       if (!user.email?.endsWith("@yournextcampus.com")) {
         return false;
@@ -23,14 +23,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const dbUser = await getUserByEmail(session.user.email!);
         
         if (dbUser) {
-          session.user.id = dbUser.id;
-          session.user.role = dbUser.role;
-          session.user.isActive = dbUser.isActive;
+          return {
+            ...session,
+            user: {
+              ...session.user,
+              id: dbUser.id,
+              role: dbUser.role,
+              isActive: dbUser.isActive,
+            },
+          };
         }
       }
       return session;
     },
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user, account }) {
       if (user && account) {
         // On first sign in, sync user to database
         const email = user.email!;

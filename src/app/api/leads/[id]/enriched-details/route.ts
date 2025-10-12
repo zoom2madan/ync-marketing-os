@@ -45,14 +45,20 @@ export async function POST(
 
     const result = await upsertLeadEnrichedDetails({
       leadId,
-      ...validatedData,
+      country: validatedData.country || null,
+      university: validatedData.university || null,
+      level: validatedData.level || null,
+      stream: validatedData.stream || null,
+      subject: validatedData.subject || null,
+      targetIntake: validatedData.targetIntake || null,
+      currentPursuit: validatedData.currentPursuit || null,
     });
 
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation error", details: error.errors },
+        { error: "Validation error", details: error.issues },
         { status: 400 }
       );
     }

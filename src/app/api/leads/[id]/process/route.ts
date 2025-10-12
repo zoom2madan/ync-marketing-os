@@ -53,14 +53,14 @@ export async function POST(
     const result = await upsertLeadProcess({
       leadId,
       stage: validatedData.stage as LeadStage,
-      notes: validatedData.notes,
+      notes: validatedData.notes || undefined,
     });
 
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation error", details: error.errors },
+        { error: "Validation error", details: error.issues },
         { status: 400 }
       );
     }

@@ -45,14 +45,21 @@ export async function POST(
 
     const result = await upsertAcademicProfile({
       leadId,
-      ...validatedData,
+      studyGrade: validatedData.studyGrade || null,
+      school: validatedData.school || null,
+      schoolBoard: validatedData.schoolBoard || null,
+      college: validatedData.college || null,
+      university: validatedData.university || null,
+      studyStream: validatedData.studyStream || null,
+      gpa: validatedData.gpa || null,
+      notes: validatedData.notes || null,
     });
 
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation error", details: error.errors },
+        { error: "Validation error", details: error.issues },
         { status: 400 }
       );
     }

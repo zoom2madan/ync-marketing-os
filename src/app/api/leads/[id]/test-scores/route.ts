@@ -43,14 +43,19 @@ export async function POST(
 
     const result = await upsertStandardizedTestScores({
       leadId,
-      ...validatedData,
+      ieltsScore: validatedData.ieltsScore ?? null,
+      pteScore: validatedData.pteScore ?? null,
+      toeflScore: validatedData.toeflScore ?? null,
+      satScore: validatedData.satScore ?? null,
+      greScore: validatedData.greScore ?? null,
+      gmatScore: validatedData.gmatScore ?? null,
     });
 
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation error", details: error.errors },
+        { error: "Validation error", details: error.issues },
         { status: 400 }
       );
     }

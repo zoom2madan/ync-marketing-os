@@ -18,22 +18,22 @@ import type {
 } from "@/types";
 
 // Helper function to convert snake_case to camelCase
-function toCamelCase<T>(obj: any): T {
-  if (!obj) return obj;
+function toCamelCase<T>(obj: unknown): T {
+  if (!obj) return obj as T;
   if (Array.isArray(obj)) {
     return obj.map((item) => toCamelCase(item)) as T;
   }
   if (typeof obj === "object" && obj !== null) {
-    const camelObj: any = {};
-    for (const key in obj) {
+    const camelObj: Record<string, unknown> = {};
+    for (const key in obj as Record<string, unknown>) {
       const camelKey = key.replace(/_([a-z])/g, (_, letter) =>
         letter.toUpperCase()
       );
-      camelObj[camelKey] = toCamelCase(obj[key]);
+      camelObj[camelKey] = toCamelCase((obj as Record<string, unknown>)[key]);
     }
-    return camelObj;
+    return camelObj as T;
   }
-  return obj;
+  return obj as T;
 }
 
 // ==================== USER QUERIES ====================
@@ -64,7 +64,7 @@ export async function updateUser(
   data: Partial<User>
 ): Promise<User | null> {
   const updates: string[] = [];
-  const values: any[] = [];
+  const values: (string | number | boolean)[] = [];
   let paramIndex = 1;
 
   if (data.firstName) {
@@ -276,7 +276,7 @@ export async function getLeads(
 
   // Build WHERE clause
   const conditions: string[] = [];
-  const params: any[] = [];
+  const params: (string | number)[] = [];
   let paramIndex = 1;
 
   // Role-based filtering
@@ -383,7 +383,7 @@ export async function updateLead(
   data: Partial<Lead>
 ): Promise<Lead | null> {
   const updates: string[] = [];
-  const values: any[] = [];
+  const values: (string | number | null)[] = [];
   let paramIndex = 1;
 
   if (data.firstName) {

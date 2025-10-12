@@ -61,7 +61,7 @@ export function CreateLeadDialog() {
         const error = await response.json();
         alert(`Error: ${error.message || "Failed to create lead"}`);
       }
-    } catch (error) {
+    } catch {
       alert("An error occurred while creating the lead");
     } finally {
       setLoading(false);

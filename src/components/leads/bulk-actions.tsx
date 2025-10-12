@@ -79,7 +79,7 @@ export function BulkActions({
         const error = await response.json();
         alert(`Error: ${error.error || "Failed to assign leads"}`);
       }
-    } catch (error) {
+    } catch {
       alert("An error occurred while assigning leads");
     } finally {
       setLoading(false);
@@ -109,7 +109,7 @@ export function BulkActions({
         const error = await response.json();
         alert(`Error: ${error.error || "Failed to update status"}`);
       }
-    } catch (error) {
+    } catch {
       alert("An error occurred while updating status");
     } finally {
       setLoading(false);
@@ -137,7 +137,7 @@ export function BulkActions({
       } else {
         alert("Failed to export leads");
       }
-    } catch (error) {
+    } catch {
       alert("An error occurred while exporting leads");
     }
   };

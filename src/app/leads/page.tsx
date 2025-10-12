@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthenticatedLayout } from "@/components/layout/authenticated-layout";
@@ -19,7 +19,7 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { LeadListItem, PaginatedResponse, User } from "@/types";
 
-export default function LeadsPage() {
+function LeadsPageContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -50,6 +50,7 @@ export default function LeadsPage() {
         fetchAgents();
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, searchParams]);
 
   const fetchLeads = async () => {
@@ -201,6 +202,22 @@ export default function LeadsPage() {
         </div>
       </div>
     </AuthenticatedLayout>
+  );
+}
+
+export default function LeadsPage() {
+  return (
+    <Suspense fallback={
+      <AuthenticatedLayout>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center">
+            <p className="text-slate-600">Loading...</p>
+          </div>
+        </div>
+      </AuthenticatedLayout>
+    }>
+      <LeadsPageContent />
+    </Suspense>
   );
 }
 

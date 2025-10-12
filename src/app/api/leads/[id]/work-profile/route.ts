@@ -42,14 +42,18 @@ export async function POST(
 
     const result = await upsertWorkProfile({
       leadId,
-      ...validatedData,
+      workingAt: validatedData.workingAt || null,
+      industry: validatedData.industry || null,
+      workDesignation: validatedData.workDesignation || null,
+      yearsOfExperience: validatedData.yearsOfExperience ?? null,
+      notes: validatedData.notes || null,
     });
 
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation error", details: error.errors },
+        { error: "Validation error", details: error.issues },
         { status: 400 }
       );
     }

@@ -60,7 +60,15 @@ export function EnrichedDetailsForm({ leadId, data, onSuccess, onCancel }: Props
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit, setValue, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: data || {},
+    defaultValues: data ? {
+      country: data.country ?? undefined,
+      university: data.university ?? undefined,
+      level: data.level ?? undefined,
+      stream: data.stream ?? undefined,
+      subject: data.subject ?? undefined,
+      targetIntake: data.targetIntake ?? undefined,
+      currentPursuit: data.currentPursuit ?? undefined,
+    } : {},
   });
 
   const level = watch("level");
@@ -81,7 +89,7 @@ export function EnrichedDetailsForm({ leadId, data, onSuccess, onCancel }: Props
       } else {
         alert("Failed to save enriched details");
       }
-    } catch (error) {
+    } catch {
       alert("An error occurred");
     } finally {
       setLoading(false);

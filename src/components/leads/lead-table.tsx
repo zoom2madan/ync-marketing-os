@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -12,7 +11,6 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import type { LeadListItem } from "@/types";
 import Link from "next/link";
@@ -23,7 +21,6 @@ interface LeadTableProps {
 }
 
 export function LeadTable({ leads, onSelectionChange }: LeadTableProps) {
-  const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const toggleAll = () => {

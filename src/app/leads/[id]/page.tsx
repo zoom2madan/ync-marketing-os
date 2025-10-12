@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { LeadDetailActions } from "@/components/leads/lead-detail-actions";
@@ -36,7 +36,7 @@ export default async function LeadDetailPage({
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-2">Lead Not Found</h2>
             <p className="text-slate-600 mb-4">
-              The lead you're looking for doesn't exist or you don't have access to it.
+              The lead you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it.
             </p>
             <Link href="/leads">
               <Button>
@@ -67,7 +67,7 @@ export default async function LeadDetailPage({
     return colors[stage] || "bg-gray-100 text-gray-800";
   };
 
-  const DataRow = ({ label, value }: { label: string; value: string | number | null | undefined }) => (
+  const DataRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
     <div className="py-2 border-b last:border-0">
       <div className="text-sm font-medium text-slate-500 mb-1">{label}</div>
       <div className="text-sm text-slate-900">{value || "-"}</div>

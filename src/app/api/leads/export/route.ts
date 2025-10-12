@@ -31,32 +31,35 @@ export async function POST(request: NextRequest) {
     }
 
     // Flatten the data for CSV export
-    const flattenedLeads = leads.map((lead) => ({
-      ID: lead.id,
-      "First Name": lead.firstName,
-      "Last Name": lead.lastName,
-      Email: lead.email || "",
-      Mobile: lead.mobile || "",
-      Request: lead.request || "",
-      Stage: (lead as any).stage || "New",
-      Platform: (lead as any).platform || "",
-      Campaign: (lead as any).campaign || "",
-      "Ad Set": (lead as any).adSet || "",
-      Ad: (lead as any).ad || "",
-      "Landing Page": (lead as any).landingPageUrl || "",
-      Country: (lead as any).country || "",
-      University: (lead as any).university || "",
-      Level: (lead as any).level || "",
-      Stream: (lead as any).stream || "",
-      Subject: (lead as any).subject || "",
-      "Target Intake": (lead as any).targetIntake || "",
-      "Current Pursuit": (lead as any).currentPursuit || "",
-      "Assigned To": (lead as any).assignedFirstName
-        ? `${(lead as any).assignedFirstName} ${(lead as any).assignedLastName}`
-        : "",
-      "Created At": new Date(lead.createdAt).toISOString(),
-      "Process Notes": (lead as any).processNotes || "",
-    }));
+    const flattenedLeads = leads.map((lead) => {
+      const leadRecord = lead as unknown as Record<string, unknown>;
+      return {
+        ID: lead.id,
+        "First Name": lead.firstName,
+        "Last Name": lead.lastName,
+        Email: lead.email || "",
+        Mobile: lead.mobile || "",
+        Request: lead.request || "",
+        Stage: (leadRecord.stage as string) || "New",
+        Platform: (leadRecord.platform as string) || "",
+        Campaign: (leadRecord.campaign as string) || "",
+        "Ad Set": (leadRecord.adSet as string) || "",
+        Ad: (leadRecord.ad as string) || "",
+        "Landing Page": (leadRecord.landingPageUrl as string) || "",
+        Country: (leadRecord.country as string) || "",
+        University: (leadRecord.university as string) || "",
+        Level: (leadRecord.level as string) || "",
+        Stream: (leadRecord.stream as string) || "",
+        Subject: (leadRecord.subject as string) || "",
+        "Target Intake": (leadRecord.targetIntake as string) || "",
+        "Current Pursuit": (leadRecord.currentPursuit as string) || "",
+        "Assigned To": leadRecord.assignedFirstName
+          ? `${leadRecord.assignedFirstName as string} ${leadRecord.assignedLastName as string}`
+          : "",
+        "Created At": new Date(lead.createdAt).toISOString(),
+        "Process Notes": (leadRecord.processNotes as string) || "",
+      };
+    });
 
     // Convert to CSV
     const parser = new Parser();
@@ -72,7 +75,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation error", details: error.errors },
+        { error: "Validation error", details: error.issues },
         { status: 400 }
       );
     }

@@ -41,14 +41,17 @@ export async function POST(
 
     const result = await upsertDemographicProfile({
       leadId,
-      ...validatedData,
+      cityTier: validatedData.cityTier || null,
+      familyIncomeRange: validatedData.familyIncomeRange || null,
+      sourceOfIncome: validatedData.sourceOfIncome || null,
+      willTakeEduLoan: validatedData.willTakeEduLoan ?? null,
     });
 
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation error", details: error.errors },
+        { error: "Validation error", details: error.issues },
         { status: 400 }
       );
     }
