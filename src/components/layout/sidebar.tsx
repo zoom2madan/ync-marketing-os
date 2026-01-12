@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, Users, Menu } from "lucide-react";
@@ -14,8 +15,8 @@ const navItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Leads",
-    href: "/leads",
+    title: "Contacts",
+    href: "/contacts",
     icon: Users,
   },
 ];
@@ -41,7 +42,18 @@ export function Sidebar() {
           <Menu className="h-5 w-5" />
         </Button>
         {!collapsed && (
-          <h1 className="text-xl font-bold text-slate-900">YNC</h1>
+          <h1 className="text-xl font-bold text-slate-900">
+            <Link href="/" className="flex items-center">
+            <Image
+              src="/yournextcampus-logo.jpg"
+              alt="YourNextCampus Logo"
+              width={120}
+              height={40}
+              className="h-8 w-auto md:h-10"
+              priority
+            />
+          </Link>
+          </h1>
         )}
       </div>
       <nav className="flex-1 space-y-1 p-3">

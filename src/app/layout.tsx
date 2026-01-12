@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Lead Management System - Your Next Campus",
-  description: "Lead management system for Your Next Campus",
+  title: "Marketing OS - Your Next Campus",
+  description: "Marketing OS for Your Next Campus",
 };
 
 export default function RootLayout({

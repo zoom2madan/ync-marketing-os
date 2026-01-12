@@ -23,7 +23,7 @@ export default function LoginPage() {
             Your Next Campus
           </CardTitle>
           <CardDescription className="text-base">
-            Lead Management System
+            Marketing OS
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
