@@ -20,7 +20,6 @@ export interface PaginationParams {
   limit: number;
 }
 
-
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: {
@@ -30,3 +29,10 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
+
+// Re-export all module types
+export * from "./customer";
+export * from "./funnel-event";
+export * from "./segment";
+export * from "./template";
+export * from "./automation";

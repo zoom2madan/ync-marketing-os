@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "automation:refresh": "./scripts/refresh_automation.sh",
+    "automation:run": "tsx scripts/run-automation.ts",
+    "automation:list": "tsx scripts/get_automation_data.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -32,6 +35,7 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.65.0",
     "tailwind-merge": "^3.3.1",
+    "resend": "^4.0.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^4.1.12"
   },
@@ -44,6 +48,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "tailwindcss": "^4",
+    "tsx": "^4.7.0",
     "typescript": "^5"
   }
 }

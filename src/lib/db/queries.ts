@@ -6,6 +6,7 @@ import type {
 // Helper function to convert snake_case to camelCase
 function toCamelCase<T>(obj: unknown): T {
   if (!obj) return obj as T;
+  if (obj instanceof Date) return obj as T;
   if (Array.isArray(obj)) {
     return obj.map((item) => toCamelCase(item)) as T;
   }

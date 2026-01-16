@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, Menu } from "lucide-react";
+import { LayoutDashboard, Users, Activity, Filter, FileText, Zap, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
@@ -15,9 +15,29 @@ const navItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Contacts",
-    href: "/contacts",
+    title: "Customers",
+    href: "/customers",
     icon: Users,
+  },
+  {
+    title: "Funnel Events",
+    href: "/events",
+    icon: Activity,
+  },
+  {
+    title: "Segments",
+    href: "/segments",
+    icon: Filter,
+  },
+  {
+    title: "Templates",
+    href: "/templates",
+    icon: FileText,
+  },
+  {
+    title: "Automations",
+    href: "/automations",
+    icon: Zap,
   },
 ];
 
