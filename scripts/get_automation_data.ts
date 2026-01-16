@@ -6,6 +6,13 @@
  * Usage: npx tsx scripts/get_automation_data.ts
  */
 
+import { config } from "dotenv";
+import { resolve } from "path";
+
+// Load environment variables from .env.local or .env (quiet mode to avoid polluting stdout)
+config({ path: resolve(process.cwd(), ".env.local"), quiet: true });
+config({ path: resolve(process.cwd(), ".env"), quiet: true });
+
 import postgres from "postgres";
 
 interface AutomationData {

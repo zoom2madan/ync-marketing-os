@@ -6,6 +6,13 @@
  * Usage: npx tsx scripts/run-automation.ts <automation_id>
  */
 
+import { config } from "dotenv";
+import { resolve } from "path";
+
+// Load environment variables from .env.local or .env
+config({ path: resolve(process.cwd(), ".env.local") });
+config({ path: resolve(process.cwd(), ".env") });
+
 import postgres from "postgres";
 
 // Types

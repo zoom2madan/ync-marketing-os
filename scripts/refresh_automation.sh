@@ -8,7 +8,7 @@
 # Usage: ./scripts/refresh_automation.sh
 #
 # Prerequisites:
-# - DATABASE_URL environment variable must be set
+# - .env.local or .env file with DATABASE_URL must exist in project root
 # - Node.js and npx must be available
 # - The script must have execute permissions: chmod +x scripts/refresh_automation.sh
 #
@@ -20,6 +20,31 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 CRON_TAG="# YNC-MARKETING-OS-AUTOMATION"
 LOG_DIR="$PROJECT_DIR/logs"
+
+# Load environment variables from .env.local or .env
+load_env() {
+    local env_file=""
+    if [ -f "$PROJECT_DIR/.env.local" ]; then
+        env_file="$PROJECT_DIR/.env.local"
+    elif [ -f "$PROJECT_DIR/.env" ]; then
+        env_file="$PROJECT_DIR/.env"
+    fi
+    
+    if [ -n "$env_file" ]; then
+        while IFS= read -r line || [ -n "$line" ]; do
+            # Skip empty lines and comments
+            [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+            # Remove 'export ' prefix if present
+            line="${line#export }"
+            # Only process lines with = sign
+            if [[ "$line" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
+                export "$line"
+            fi
+        done < "$env_file"
+    fi
+}
+
+load_env
 
 # Colors for output
 RED='\033[0;31m'
@@ -99,7 +124,7 @@ add_automation_crons() {
             
             if [ -n "$id" ] && [ -n "$cron" ]; then
                 local log_file="$LOG_DIR/automation_${id}.log"
-                local entry="$cron cd $PROJECT_DIR && DATABASE_URL=\"\$DATABASE_URL\" npx tsx scripts/run-automation.ts $id >> $log_file 2>&1 $CRON_TAG $name"
+                local entry="$cron cd $PROJECT_DIR && npx tsx scripts/run-automation.ts $id >> $log_file 2>&1 $CRON_TAG $name"
                 cron_entries="${cron_entries}${entry}\n"
                 log_info "  Added: $name (ID: $id) - Schedule: $cron"
             fi
@@ -120,7 +145,7 @@ add_automation_crons() {
             
             if [ -n "$id" ] && [ -n "$cron" ]; then
                 local log_file="$LOG_DIR/automation_${id}.log"
-                local entry="$cron cd $PROJECT_DIR && DATABASE_URL=\"\$DATABASE_URL\" npx tsx scripts/run-automation.ts $id >> $log_file 2>&1 $CRON_TAG $name"
+                local entry="$cron cd $PROJECT_DIR && npx tsx scripts/run-automation.ts $id >> $log_file 2>&1 $CRON_TAG $name"
                 cron_entries="${cron_entries}${entry}\n"
                 log_info "  Added: $name (ID: $id) - Schedule: $cron"
             fi
