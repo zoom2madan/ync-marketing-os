@@ -18,9 +18,23 @@ import postgres from "postgres";
 // Types
 interface Customer {
   id: number;
-  firstName: string | null;
-  lastName: string | null;
+  lms_lead_id: string | null;
+  first_name: string | null;
+  last_name: string | null;
   email: string;
+  mobile: string | null;
+  created_at: Date;
+  updated_at: Date;
+  source_created_at: Date | null;
+  source_updated_at: Date | null;
+}
+
+interface CustomerAttribute {
+  id: number;
+  customer_id: number;
+  field_type: string;
+  field_name: string;
+  field_value: unknown;
 }
 
 interface AutomationData {
@@ -54,7 +68,84 @@ function toCamelCase<T>(obj: unknown): T {
   return obj as T;
 }
 
-// Simple variable replacement
+// Helper function to convert snake_case to camelCase
+function snakeToCamel(str: string): string {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+// Helper function to convert camelCase to snake_case
+function camelToSnake(str: string): string {
+  return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+}
+
+/**
+ * Build a variables object that supports both snake_case and camelCase tokens.
+ * For a variable like "first_name", both {{first_name}} and {{firstName}} will work.
+ */
+function buildVariables(
+  customer: Customer,
+  attributes: CustomerAttribute[]
+): Record<string, unknown> {
+  const variables: Record<string, unknown> = {};
+
+  // Add all customer fields (both snake_case original and camelCase versions)
+  const customerFields: Record<string, unknown> = {
+    id: customer.id,
+    lms_lead_id: customer.lms_lead_id,
+    first_name: customer.first_name,
+    last_name: customer.last_name,
+    email: customer.email,
+    mobile: customer.mobile,
+  };
+
+  for (const [key, value] of Object.entries(customerFields)) {
+    // Add original snake_case key
+    variables[key] = value ?? "";
+    // Add camelCase version
+    const camelKey = snakeToCamel(key);
+    if (camelKey !== key) {
+      variables[camelKey] = value ?? "";
+    }
+  }
+
+  // Add all customer attributes by their field_name
+  for (const attr of attributes) {
+    // Extract the actual value from JSONB field_value
+    let value = attr.field_value;
+
+    // Handle JSONB values - the value might be wrapped or stored directly
+    if (value !== null && value !== undefined) {
+      // If it's a string that looks like JSON, try to parse it
+      if (typeof value === "string") {
+        try {
+          value = JSON.parse(value);
+        } catch {
+          // Keep as string if not valid JSON
+        }
+      }
+    }
+
+    const fieldName = attr.field_name;
+    // Add the original field_name as token
+    variables[fieldName] = value ?? "";
+    
+    // Also add camelCase version if field_name is in snake_case
+    const camelFieldName = snakeToCamel(fieldName);
+    if (camelFieldName !== fieldName) {
+      variables[camelFieldName] = value ?? "";
+    }
+    
+    // Also add snake_case version if field_name is in camelCase
+    const snakeFieldName = camelToSnake(fieldName);
+    if (snakeFieldName !== fieldName) {
+      variables[snakeFieldName] = value ?? "";
+    }
+  }
+
+  return variables;
+}
+
+// Variable replacement supporting nested properties like {{customer.firstName}}
 function replaceVariables(
   content: string,
   variables: Record<string, unknown>
@@ -67,11 +158,36 @@ function replaceVariables(
       if (value && typeof value === "object" && k in value) {
         value = (value as Record<string, unknown>)[k];
       } else {
-        return match;
+        // Try alternative case versions
+        const camelK = snakeToCamel(k);
+        const snakeK = camelToSnake(k);
+        
+        if (value && typeof value === "object") {
+          if (camelK !== k && camelK in value) {
+            value = (value as Record<string, unknown>)[camelK];
+          } else if (snakeK !== k && snakeK in value) {
+            value = (value as Record<string, unknown>)[snakeK];
+          } else {
+            return match; // Keep original if variable not found
+          }
+        } else {
+          return match;
+        }
       }
     }
 
-    return String(value ?? match);
+    // Format the value for display
+    if (value === null || value === undefined) {
+      return "";
+    }
+    if (value instanceof Date) {
+      return value.toLocaleDateString();
+    }
+    if (typeof value === "object") {
+      return JSON.stringify(value);
+    }
+
+    return String(value);
   });
 }
 
@@ -234,9 +350,10 @@ async function main() {
       process.exit(0);
     }
 
-    // Fetch customer details
+    // Fetch customer details (all columns)
     const customers = await sql`
-      SELECT id, first_name, last_name, email
+      SELECT id, lms_lead_id, first_name, last_name, email, mobile, 
+             created_at, updated_at, source_created_at, source_updated_at
       FROM customers
       WHERE id = ANY(${customerIds})
     `;
@@ -247,14 +364,18 @@ async function main() {
 
     // Process each customer
     for (const row of customers) {
-      const customer = toCamelCase<Customer>(row);
+      const customer = row as Customer;
 
-      // Prepare variables
-      const variables = {
-        firstName: customer.firstName || "",
-        lastName: customer.lastName || "",
-        email: customer.email,
-      };
+      // Fetch customer attributes
+      const attributeRows = await sql`
+        SELECT id, customer_id, field_type, field_name, field_value
+        FROM customer_attributes
+        WHERE customer_id = ${customer.id}
+      `;
+      const attributes = attributeRows as CustomerAttribute[];
+
+      // Build variables object with both snake_case and camelCase support
+      const variables = buildVariables(customer, attributes);
 
       // Render template
       const subject = replaceVariables(

@@ -6,9 +6,20 @@ import type { TemplateVariables } from "@/types";
  * For now, this provides basic variable substitution and HTML conversion.
  */
 
+// Helper function to convert snake_case to camelCase
+function snakeToCamel(str: string): string {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+// Helper function to convert camelCase to snake_case
+function camelToSnake(str: string): string {
+  return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+}
+
 /**
  * Replace template variables in the content.
  * Variables are in the format {{variableName}} or {{customer.attribute}}
+ * Supports both snake_case ({{first_name}}) and camelCase ({{firstName}}) tokens.
  */
 export function replaceVariables(
   content: string,
@@ -22,11 +33,36 @@ export function replaceVariables(
       if (value && typeof value === "object" && k in value) {
         value = (value as Record<string, unknown>)[k];
       } else {
-        return match; // Keep original if variable not found
+        // Try alternative case versions
+        const camelK = snakeToCamel(k);
+        const snakeK = camelToSnake(k);
+        
+        if (value && typeof value === "object") {
+          if (camelK !== k && camelK in value) {
+            value = (value as Record<string, unknown>)[camelK];
+          } else if (snakeK !== k && snakeK in value) {
+            value = (value as Record<string, unknown>)[snakeK];
+          } else {
+            return match; // Keep original if variable not found
+          }
+        } else {
+          return match;
+        }
       }
     }
 
-    return String(value ?? match);
+    // Format the value for display
+    if (value === null || value === undefined) {
+      return "";
+    }
+    if (value instanceof Date) {
+      return value.toLocaleDateString();
+    }
+    if (typeof value === "object") {
+      return JSON.stringify(value);
+    }
+
+    return String(value);
   });
 }
 
@@ -126,14 +162,24 @@ export function renderTemplate(
 
 /**
  * Get sample variables for preview.
+ * Includes both snake_case and camelCase versions for template compatibility.
  */
 export function getSampleVariables(): TemplateVariables {
   return {
+    // camelCase versions
     firstName: "John",
     lastName: "Doe",
     email: "john.doe@example.com",
+    mobile: "+1234567890",
+    lmsLeadId: "LEAD-12345",
     companyName: "Your Next Campus",
     unsubscribeUrl: "https://example.com/unsubscribe",
+    // snake_case versions (for templates using snake_case tokens)
+    first_name: "John",
+    last_name: "Doe",
+    lms_lead_id: "LEAD-12345",
+    company_name: "Your Next Campus",
+    unsubscribe_url: "https://example.com/unsubscribe",
   };
 }
 
