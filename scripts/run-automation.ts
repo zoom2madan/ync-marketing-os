@@ -409,11 +409,21 @@ async function main() {
 
       if (result.success) {
         // Log the successful send to automation_tracker to prevent duplicate emails
-        await sql`
-          INSERT INTO automation_tracker (automation_id, customer_id)
-          VALUES (${automationId}, ${customer.id})
-          ON CONFLICT (automation_id, customer_id) DO NOTHING
-        `;
+        try {
+          const trackerResult = await sql`
+            INSERT INTO automation_tracker (automation_id, customer_id)
+            VALUES (${automationId}, ${customer.id})
+            ON CONFLICT (automation_id, customer_id) DO NOTHING
+            RETURNING id
+          `;
+          if (trackerResult.length > 0) {
+            console.log(`  Tracked in automation_tracker with id: ${trackerResult[0].id}`);
+          } else {
+            console.log(`  Customer ${customer.id} already tracked for automation ${automationId} (no insert)`);
+          }
+        } catch (trackerError) {
+          console.error(`  Failed to track email in automation_tracker:`, trackerError);
+        }
         processed++;
         console.log(`  Sent to ${customer.email}`);
       } else {

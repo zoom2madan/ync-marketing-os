@@ -21,6 +21,11 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 CRON_TAG="# YNC-MARKETING-OS-AUTOMATION"
 LOG_DIR="$PROJECT_DIR/logs"
 
+# Get the Node.js bin directory (required for cron which has minimal PATH)
+# For fnm/nvm users, we need to resolve through the symlinks to find the actual bin dir
+NPX_LOCATION="$(which npx)"
+NODE_BIN_DIR="$(cd "$(dirname "$NPX_LOCATION")" && pwd -P)"
+
 # Load environment variables from .env.local or .env
 load_env() {
     local env_file=""
@@ -124,7 +129,7 @@ add_automation_crons() {
             
             if [ -n "$id" ] && [ -n "$cron" ]; then
                 local log_file="$LOG_DIR/automation_${id}.log"
-                local entry="$cron cd $PROJECT_DIR && npx tsx scripts/run-automation.ts $id >> $log_file 2>&1 $CRON_TAG $name"
+                local entry="$cron cd $PROJECT_DIR && PATH=$NODE_BIN_DIR:\$PATH npx tsx scripts/run-automation.ts $id >> $log_file 2>&1 $CRON_TAG $name"
                 cron_entries="${cron_entries}${entry}\n"
                 log_info "  Added: $name (ID: $id) - Schedule: $cron"
             fi
@@ -145,7 +150,7 @@ add_automation_crons() {
             
             if [ -n "$id" ] && [ -n "$cron" ]; then
                 local log_file="$LOG_DIR/automation_${id}.log"
-                local entry="$cron cd $PROJECT_DIR && npx tsx scripts/run-automation.ts $id >> $log_file 2>&1 $CRON_TAG $name"
+                local entry="$cron cd $PROJECT_DIR && PATH=$NODE_BIN_DIR:\$PATH npx tsx scripts/run-automation.ts $id >> $log_file 2>&1 $CRON_TAG $name"
                 cron_entries="${cron_entries}${entry}\n"
                 log_info "  Added: $name (ID: $id) - Schedule: $cron"
             fi
