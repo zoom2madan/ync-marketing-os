@@ -164,3 +164,17 @@ CREATE TABLE IF NOT EXISTS automation_logs (
 CREATE INDEX IF NOT EXISTS idx_automation_logs_automation_id ON automation_logs(automation_id);
 CREATE INDEX IF NOT EXISTS idx_automation_logs_status ON automation_logs(status);
 CREATE INDEX IF NOT EXISTS idx_automation_logs_started_at ON automation_logs(started_at);
+
+-- ==================== AUTOMATION_TRACKER ====================
+-- Tracks which customers have received emails from each automation
+-- Prevents duplicate emails by ensuring each customer only receives one email per automation
+CREATE TABLE IF NOT EXISTS automation_tracker (
+    id SERIAL PRIMARY KEY,
+    automation_id INTEGER REFERENCES automations(id) ON DELETE CASCADE,
+    customer_id INTEGER REFERENCES customers(id) ON DELETE CASCADE,
+    message_sent_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(automation_id, customer_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_automation_tracker_automation_id ON automation_tracker(automation_id);
+CREATE INDEX IF NOT EXISTS idx_automation_tracker_customer_id ON automation_tracker(customer_id);

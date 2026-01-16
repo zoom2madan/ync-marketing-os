@@ -329,3 +329,85 @@ export async function getAutomationForExecution(
   };
 }
 
+// ==================== AUTOMATION TRACKER ====================
+// Tracks which customers have received emails from each automation
+
+export interface AutomationTrackerEntry {
+  id: number;
+  automationId: number;
+  customerId: number;
+  messageSentAt: Date;
+}
+
+/**
+ * Get customer IDs that have already received an email from a specific automation
+ */
+export async function getTrackedCustomerIds(
+  automationId: number
+): Promise<number[]> {
+  const result = await sql`
+    SELECT customer_id FROM automation_tracker
+    WHERE automation_id = ${automationId}
+  `;
+  return result.map((r) => r.customer_id as number);
+}
+
+/**
+ * Record that a customer has received an email from an automation
+ */
+export async function trackCustomerEmail(
+  automationId: number,
+  customerId: number
+): Promise<AutomationTrackerEntry> {
+  const result = await sql`
+    INSERT INTO automation_tracker (automation_id, customer_id)
+    VALUES (${automationId}, ${customerId})
+    ON CONFLICT (automation_id, customer_id) DO NOTHING
+    RETURNING *
+  `;
+  return toCamelCase<AutomationTrackerEntry>(result[0]);
+}
+
+/**
+ * Check if a customer has already received an email from an automation
+ */
+export async function hasCustomerReceivedEmail(
+  automationId: number,
+  customerId: number
+): Promise<boolean> {
+  const result = await sql`
+    SELECT 1 FROM automation_tracker
+    WHERE automation_id = ${automationId} AND customer_id = ${customerId}
+    LIMIT 1
+  `;
+  return result.length > 0;
+}
+
+/**
+ * Get all tracker entries for an automation (useful for debugging/admin)
+ */
+export async function getAutomationTrackerEntries(
+  automationId: number
+): Promise<AutomationTrackerEntry[]> {
+  const result = await sql`
+    SELECT * FROM automation_tracker
+    WHERE automation_id = ${automationId}
+    ORDER BY message_sent_at DESC
+  `;
+  return toCamelCase<AutomationTrackerEntry[]>(result);
+}
+
+/**
+ * Clear tracker entries for an automation (allows re-sending to all customers)
+ */
+export async function clearAutomationTracker(
+  automationId: number
+): Promise<number> {
+  const result = await sql`
+    DELETE FROM automation_tracker
+    WHERE automation_id = ${automationId}
+    RETURNING id
+  `;
+  return result.length;
+}
+

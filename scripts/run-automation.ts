@@ -338,8 +338,27 @@ async function main() {
     }
     // Note: Function-based segments would need the handlers to be loaded
 
+    // Filter out customers who have already received an email from this automation
+    if (customerIds.length > 0) {
+      const alreadyEmailedResult = await sql`
+        SELECT customer_id FROM automation_tracker
+        WHERE automation_id = ${automationId}
+        AND customer_id = ANY(${customerIds})
+      `;
+      const alreadyEmailedIds = new Set(
+        alreadyEmailedResult.map((r) => r.customer_id as number)
+      );
+      
+      const originalCount = customerIds.length;
+      customerIds = customerIds.filter((id) => !alreadyEmailedIds.has(id));
+      
+      if (alreadyEmailedIds.size > 0) {
+        console.log(`  Filtered out ${alreadyEmailedIds.size} customers who already received email from this automation`);
+      }
+    }
+
     if (customerIds.length === 0) {
-      console.log("No customers in segment, skipping");
+      console.log("No new customers to email (all already received email or segment is empty), skipping");
       await sql`
         UPDATE automation_logs SET
           status = 'completed',
@@ -389,6 +408,12 @@ async function main() {
       const result = await sendEmail(customer.email, subject, html);
 
       if (result.success) {
+        // Log the successful send to automation_tracker to prevent duplicate emails
+        await sql`
+          INSERT INTO automation_tracker (automation_id, customer_id)
+          VALUES (${automationId}, ${customer.id})
+          ON CONFLICT (automation_id, customer_id) DO NOTHING
+        `;
         processed++;
         console.log(`  Sent to ${customer.email}`);
       } else {
