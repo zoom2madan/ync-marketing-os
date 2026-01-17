@@ -6,10 +6,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TemplatePreview } from "@/components/templates/template-preview";
 import { Mail, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
-import type { Template } from "@/types";
+import type { MessageTemplate } from "@/types";
 
 interface TemplateDetailTabsProps {
-  template: Template;
+  template: MessageTemplate;
 }
 
 export function TemplateDetailTabs({ template }: TemplateDetailTabsProps) {

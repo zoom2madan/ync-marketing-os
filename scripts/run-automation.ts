@@ -404,7 +404,7 @@ async function main() {
         FROM customer_attributes
         WHERE customer_id = ${customer.id}
       `;
-      const attributes = attributeRows as CustomerAttribute[];
+      const attributes = attributeRows as unknown as CustomerAttribute[];
 
       // Build variables object with both snake_case and camelCase support
       const variables = buildVariables(customer, attributes);
