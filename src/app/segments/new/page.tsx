@@ -28,9 +28,7 @@ export default async function NewSegmentPage() {
           />
         </div>
 
-        <div className="max-w-2xl">
-          <SegmentForm />
-        </div>
+        <SegmentForm />
       </div>
     </AuthenticatedLayout>
   );

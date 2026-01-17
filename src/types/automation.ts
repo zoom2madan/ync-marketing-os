@@ -62,6 +62,13 @@ export interface AutomationSearchParams {
   limit?: number;
 }
 
+export interface AutomationLogSearchParams {
+  automationId?: number;
+  status?: AutomationLogStatus;
+  page?: number;
+  limit?: number;
+}
+
 // CRON builder types
 export interface CronParts {
   minute: string;

@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, Mail, User, Calendar, Activity } from "lucide-react";
+import { ArrowLeft, Calendar, Activity, User, ArrowRightCircle, Circle } from "lucide-react";
 import { getSession } from "@/lib/auth/middleware";
 import { getFunnelEventById } from "@/lib/db/funnel-event-queries";
 import { format } from "date-fns";
@@ -53,13 +53,12 @@ export default async function EventDetailPage({ params }: PageProps) {
           />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Event Information Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Event Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Event Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="flex items-center gap-3">
                 <Activity className="h-4 w-4 text-slate-400" />
                 <div>
@@ -71,16 +70,18 @@ export default async function EventDetailPage({ params }: PageProps) {
               </div>
               
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 flex-1">
-                  <div className="flex-1">
-                    <p className="text-sm text-slate-500">From Stage</p>
-                    <p className="font-medium">{event.fromStage || "—"}</p>
-                  </div>
-                  <ArrowRight className="h-5 w-5 text-slate-400" />
-                  <div className="flex-1">
-                    <p className="text-sm text-slate-500">To Stage</p>
-                    <p className="font-medium">{event.toStage}</p>
-                  </div>
+                <Circle className="h-4 w-4 text-slate-400" />
+                <div>
+                  <p className="text-sm text-slate-500">From Stage</p>
+                  <p className="font-medium">{event.fromStage || "—"}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <ArrowRightCircle className="h-4 w-4 text-slate-400" />
+                <div>
+                  <p className="text-sm text-slate-500">To Stage</p>
+                  <p className="font-medium">{event.toStage}</p>
                 </div>
               </div>
 
@@ -93,40 +94,16 @@ export default async function EventDetailPage({ params }: PageProps) {
                   </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Customer Information Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Customer Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3">
-                <User className="h-4 w-4 text-slate-400" />
-                <div>
-                  <p className="text-sm text-slate-500">Name</p>
-                  <p className="font-medium">{customerName}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-slate-400" />
-                <div>
-                  <p className="text-sm text-slate-500">Email</p>
-                  <p className="font-medium">{event.customerEmail}</p>
-                </div>
-              </div>
-              
-              <div className="pt-4">
-                <Button variant="outline" className="w-full" asChild>
-                  <Link href={`/customers/${event.customerId}`}>
-                    View Customer Profile
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Button variant="outline" asChild>
+          <Link href={`/customers/${event.customerId}`}>
+            <User className="h-4 w-4 mr-2" />
+            View Customer Profile
+          </Link>
+        </Button>
       </div>
     </AuthenticatedLayout>
   );

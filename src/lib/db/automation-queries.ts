@@ -7,6 +7,7 @@ import type {
   CreateAutomationRequest,
   UpdateAutomationRequest,
   AutomationSearchParams,
+  AutomationLogSearchParams,
   AutomationLogStatus,
   PaginatedResponse,
 } from "@/types";
@@ -223,6 +224,76 @@ export async function getAutomationLogs(
       totalPages: Math.ceil(total / limit),
     },
   };
+}
+
+export async function getAllAutomationLogs(
+  params: AutomationLogSearchParams
+): Promise<PaginatedResponse<AutomationLogWithDetails>> {
+  const page = params.page || 1;
+  const limit = params.limit || 20;
+  const offset = (page - 1) * limit;
+
+  let whereClause = "WHERE 1=1";
+  const values: (string | number)[] = [];
+  let paramIndex = 1;
+
+  if (params.automationId) {
+    whereClause += ` AND al.automation_id = $${paramIndex}`;
+    values.push(params.automationId);
+    paramIndex++;
+  }
+
+  if (params.status) {
+    whereClause += ` AND al.status = $${paramIndex}`;
+    values.push(params.status);
+    paramIndex++;
+  }
+
+  // Get total count
+  const countQuery = `
+    SELECT COUNT(*) as total 
+    FROM automation_logs al 
+    ${whereClause}
+  `;
+  const countResult = await sql.unsafe(countQuery, values);
+  const total = parseInt(countResult[0].total, 10);
+
+  // Get paginated data with automation details
+  const dataQuery = `
+    SELECT 
+      al.*,
+      a.name as automation_name
+    FROM automation_logs al
+    JOIN automations a ON al.automation_id = a.id
+    ${whereClause}
+    ORDER BY al.started_at DESC
+    LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+  `;
+  const dataResult = await sql.unsafe(dataQuery, [...values, limit, offset]);
+
+  return {
+    data: toCamelCase<AutomationLogWithDetails[]>(dataResult),
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
+
+export async function getAutomationLogById(
+  id: number
+): Promise<AutomationLogWithDetails | null> {
+  const result = await sql`
+    SELECT 
+      al.*,
+      a.name as automation_name
+    FROM automation_logs al
+    JOIN automations a ON al.automation_id = a.id
+    WHERE al.id = ${id}
+  `;
+  return result.length > 0 ? toCamelCase<AutomationLogWithDetails>(result[0]) : null;
 }
 
 export async function createAutomationLog(

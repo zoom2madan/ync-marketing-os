@@ -60,24 +60,15 @@ export default async function SegmentDetailPage({ params }: PageProps) {
           <PageHeader
             title={segment.name}
             description={segment.description || "No description"}
-            actions={
-              <Button variant="outline" asChild>
-                <Link href={`/segments/${segment.id}/edit`}>
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit
-                </Link>
-              </Button>
-            }
           />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Segment Information Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Segment Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Segment Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="flex items-center gap-3">
                 <TypeIcon className="h-4 w-4 text-slate-400" />
                 <div>
@@ -98,56 +89,69 @@ export default async function SegmentDetailPage({ params }: PageProps) {
                 </div>
               )}
 
-              {segment.type === "sql" && segment.selectionSql && (
+              <div className="flex items-center gap-3">
                 <div>
-                  <p className="text-sm text-slate-500 mb-2">Selection SQL</p>
-                  <pre className="p-3 bg-slate-100 rounded-lg text-xs font-mono overflow-x-auto">
-                    {segment.selectionSql}
-                  </pre>
+                  <p className="text-sm text-slate-500">Created</p>
+                  <p className="font-medium">{format(new Date(segment.createdAt), "PPP")}</p>
                 </div>
-              )}
-
-              {segment.type === "function" && segment.handlerFunction && (
-                <div className="flex items-center gap-3">
-                  <Cog className="h-4 w-4 text-slate-400" />
-                  <div>
-                    <p className="text-sm text-slate-500">Handler Function</p>
-                    <code className="text-sm bg-slate-100 px-2 py-1 rounded">
-                      {segment.handlerFunction}
-                    </code>
-                  </div>
-                </div>
-              )}
-
-              <div className="pt-4 border-t text-sm text-slate-500">
-                <p>Created: {format(new Date(segment.createdAt), "PPP")}</p>
-                <p>Updated: {format(new Date(segment.updatedAt), "PPP")}</p>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Actions Card */}
+              <div className="flex items-center gap-3">
+                <div>
+                  <p className="text-sm text-slate-500">Updated</p>
+                  <p className="font-medium">{format(new Date(segment.updatedAt), "PPP")}</p>
+                </div>
+              </div>
+            </div>
+
+            {segment.type === "sql" && segment.selectionSql && (
+              <div className="pt-4 border-t">
+                <p className="text-sm text-slate-500 mb-2">Selection SQL</p>
+                <pre className="p-3 bg-slate-100 rounded-lg text-xs font-mono overflow-x-auto">
+                  {segment.selectionSql}
+                </pre>
+              </div>
+            )}
+
+            {segment.type === "function" && segment.handlerFunction && (
+              <div className="pt-4 border-t flex items-center gap-3">
+                <Cog className="h-4 w-4 text-slate-400" />
+                <div>
+                  <p className="text-sm text-slate-500">Handler Function</p>
+                  <code className="text-sm bg-slate-100 px-2 py-1 rounded">
+                    {segment.handlerFunction}
+                  </code>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link href={`/segments/${segment.id}/edit`}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href={`/segments/${segment.id}/customers`}>
+              <Users className="h-4 w-4 mr-2" />
+              View Customers in Segment
+            </Link>
+          </Button>
+        </div>
+
+        {segment.type === "manual" && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Actions</CardTitle>
+              <CardTitle className="text-lg">Upload Customers</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <Link href={`/segments/${segment.id}/customers`}>
-                  <Users className="h-4 w-4 mr-2" />
-                  View Customers in Segment
-                </Link>
-              </Button>
-
-              {segment.type === "manual" && (
-                <div className="pt-4 border-t">
-                  <p className="text-sm font-medium mb-3">Upload Customers</p>
-                  <SegmentCustomersUpload segmentId={segment.id} />
-                </div>
-              )}
+            <CardContent>
+              <SegmentCustomersUpload segmentId={segment.id} />
             </CardContent>
           </Card>
-        </div>
+        )}
       </div>
     </AuthenticatedLayout>
   );

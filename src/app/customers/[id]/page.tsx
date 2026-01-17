@@ -61,20 +61,12 @@ export default async function CustomerDetailPage({ params }: PageProps) {
           />
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Customer Information Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Customer Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3">
-                <User className="h-4 w-4 text-slate-400" />
-                <div>
-                  <p className="text-sm text-slate-500">Name</p>
-                  <p className="font-medium">{fullName}</p>
-                </div>
-              </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Customer Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-slate-400" />
                 <div>
@@ -100,27 +92,16 @@ export default async function CustomerDetailPage({ params }: PageProps) {
                   </div>
                 </div>
               )}
-              <div className="pt-4 border-t text-sm text-slate-500">
-                <p>Created: {format(new Date(customer.createdAt), "PPP")}</p>
-                <p>Updated: {format(new Date(customer.updatedAt), "PPP")}</p>
+              <div className="flex items-center gap-3">
+                <User className="h-4 w-4 text-slate-400" />
+                <div>
+                  <p className="text-sm text-slate-500">Created</p>
+                  <p className="font-medium">{format(new Date(customer.createdAt), "PPP")}</p>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Links Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Quick Links</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <Link href={`/events?customerId=${customer.id}`}>
-                  View Funnel Events
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Customer Attributes Table */}
         <Card>

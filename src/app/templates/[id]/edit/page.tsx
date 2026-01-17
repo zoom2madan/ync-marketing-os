@@ -46,9 +46,7 @@ export default async function EditTemplatePage({ params }: PageProps) {
           />
         </div>
 
-        <div className="max-w-4xl">
-          <TemplateForm template={template} isEdit />
-        </div>
+        <TemplateForm template={template} isEdit />
       </div>
     </AuthenticatedLayout>
   );

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, Activity, Filter, FileText, Zap, Menu } from "lucide-react";
+import { LayoutDashboard, Users, Activity, Filter, FileText, Zap, History, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
@@ -38,6 +38,11 @@ const navItems = [
     title: "Automations",
     href: "/automations",
     icon: Zap,
+  },
+  {
+    title: "Automation Logs",
+    href: "/automation-logs",
+    icon: History,
   },
 ];
 

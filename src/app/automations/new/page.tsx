@@ -28,9 +28,7 @@ export default async function NewAutomationPage() {
           />
         </div>
 
-        <div className="max-w-3xl">
-          <AutomationForm />
-        </div>
+        <AutomationForm />
       </div>
     </AuthenticatedLayout>
   );

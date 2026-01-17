@@ -28,9 +28,7 @@ export default async function NewTemplatePage() {
           />
         </div>
 
-        <div className="max-w-4xl">
-          <TemplateForm />
-        </div>
+        <TemplateForm />
       </div>
     </AuthenticatedLayout>
   );

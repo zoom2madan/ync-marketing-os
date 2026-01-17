@@ -46,9 +46,7 @@ export default async function EditSegmentPage({ params }: PageProps) {
           />
         </div>
 
-        <div className="max-w-2xl">
-          <SegmentForm segment={segment} isEdit />
-        </div>
+        <SegmentForm segment={segment} isEdit />
       </div>
     </AuthenticatedLayout>
   );

@@ -46,9 +46,7 @@ export default async function EditAutomationPage({ params }: PageProps) {
           />
         </div>
 
-        <div className="max-w-3xl">
-          <AutomationForm automation={automation} isEdit />
-        </div>
+        <AutomationForm automation={automation} isEdit />
       </div>
     </AuthenticatedLayout>
   );
