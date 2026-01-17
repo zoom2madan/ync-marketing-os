@@ -25,6 +25,8 @@ const templateSchema = z.object({
   type: z.enum(["email", "whatsapp"]),
   subject: z.string().optional(),
   message: z.string().min(1, "Message content is required"),
+  fromEmail: z.string().optional(),
+  replyTo: z.string().email("Please enter a valid email address").optional().or(z.literal("")),
 });
 
 type TemplateFormData = z.infer<typeof templateSchema>;
@@ -54,6 +56,8 @@ export function TemplateForm({ template, isEdit = false }: TemplateFormProps) {
       type: template?.type || "email",
       subject: template?.subject || "",
       message: template?.message || "",
+      fromEmail: template?.fromEmail || "",
+      replyTo: template?.replyTo || "",
     },
   });
 
@@ -101,6 +105,9 @@ export function TemplateForm({ template, isEdit = false }: TemplateFormProps) {
         body: JSON.stringify({
           ...data,
           templatingType: "mjml",
+          // Only include email fields for email templates
+          fromEmail: data.type === "email" ? data.fromEmail : undefined,
+          replyTo: data.type === "email" ? data.replyTo : undefined,
         }),
       });
 
@@ -172,17 +179,49 @@ export function TemplateForm({ template, isEdit = false }: TemplateFormProps) {
               </div>
 
               {selectedType === "email" && (
-                <div className="space-y-2">
-                  <Label htmlFor="subject">Subject *</Label>
-                  <Input
-                    id="subject"
-                    {...register("subject")}
-                    placeholder="Welcome to Your Next Campus!"
-                  />
-                  {errors.subject && (
-                    <p className="text-sm text-red-600">{errors.subject.message}</p>
-                  )}
-                </div>
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="subject">Subject *</Label>
+                    <Input
+                      id="subject"
+                      {...register("subject")}
+                      placeholder="Welcome to Your Next Campus!"
+                    />
+                    {errors.subject && (
+                      <p className="text-sm text-red-600">{errors.subject.message}</p>
+                    )}
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="fromEmail">From Email</Label>
+                      <Input
+                        id="fromEmail"
+                        {...register("fromEmail")}
+                        placeholder="Your Next Campus<noreply@comms.yournextcampus.com>"
+                      />
+                      <p className="text-xs text-slate-500">
+                        Format: Name&lt;email@domain.com&gt;
+                      </p>
+                      {errors.fromEmail && (
+                        <p className="text-sm text-red-600">{errors.fromEmail.message}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="replyTo">Reply-To Email</Label>
+                      <Input
+                        id="replyTo"
+                        type="email"
+                        {...register("replyTo")}
+                        placeholder="hello@yournextcampus.com"
+                      />
+                      {errors.replyTo && (
+                        <p className="text-sm text-red-600">{errors.replyTo.message}</p>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className="space-y-2">

@@ -88,13 +88,15 @@ export async function createTemplate(
   data: CreateTemplateRequest
 ): Promise<MessageTemplate> {
   const result = await sql`
-    INSERT INTO message_templates (name, type, templating_type, subject, message)
+    INSERT INTO message_templates (name, type, templating_type, subject, message, from_email, reply_to)
     VALUES (
       ${data.name}, 
       ${data.type}, 
       ${data.templatingType || "mjml"}, 
       ${data.subject || null}, 
-      ${data.message}
+      ${data.message},
+      ${data.fromEmail || null},
+      ${data.replyTo || null}
     )
     RETURNING *
   `;
@@ -114,7 +116,9 @@ export async function updateTemplate(
       type = ${data.type ?? template.type},
       templating_type = ${data.templatingType ?? template.templatingType},
       subject = ${data.subject ?? template.subject},
-      message = ${data.message ?? template.message}
+      message = ${data.message ?? template.message},
+      from_email = ${data.fromEmail ?? template.fromEmail},
+      reply_to = ${data.replyTo ?? template.replyTo}
     WHERE id = ${id}
     RETURNING *
   `;

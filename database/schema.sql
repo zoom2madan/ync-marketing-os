@@ -121,6 +121,8 @@ CREATE TABLE IF NOT EXISTS message_templates (
     templating_type VARCHAR(20) DEFAULT 'mjml',
     subject VARCHAR(500),
     message TEXT NOT NULL,
+    from_email VARCHAR(500),  -- Sender email with name, e.g., "Name<email@domain.com>". For email type only.
+    reply_to VARCHAR(255),    -- Reply-to email address. For email type only.
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

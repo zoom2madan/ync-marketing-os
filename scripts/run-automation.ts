@@ -44,6 +44,8 @@ interface AutomationData {
   messageTemplateId: number;
   templateSubject: string | null;
   templateMessage: string;
+  templateFromEmail: string | null;
+  templateReplyTo: string | null;
   segmentType: string;
   selectionSql: string | null;
   handlerFunction: string | null;
@@ -235,23 +237,32 @@ function convertToHtml(content: string): string {
 async function sendEmail(
   to: string,
   subject: string,
-  html: string
+  html: string,
+  fromEmail?: string | null,
+  replyTo?: string | null
 ): Promise<{ success: boolean; error?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@example.com";
+  const from = fromEmail || "noreply@notifications.yournextcampus.com";
 
   if (!apiKey) {
     return { success: false, error: "RESEND_API_KEY not configured" };
   }
 
   try {
+    const emailPayload: Record<string, string> = { from, to, subject, html };
+    
+    // Add reply_to if provided
+    if (replyTo) {
+      emailPayload.reply_to = replyTo;
+    }
+
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from: fromEmail, to, subject, html }),
+      body: JSON.stringify(emailPayload),
     });
 
     if (!response.ok) {
@@ -296,6 +307,8 @@ async function main() {
         a.message_template_id,
         mt.subject as template_subject,
         mt.message as template_message,
+        mt.from_email as template_from_email,
+        mt.reply_to as template_reply_to,
         cs.type as segment_type,
         cs.selection_sql,
         cs.handler_function
@@ -405,7 +418,13 @@ async function main() {
       const html = convertToHtml(content);
 
       // Send email
-      const result = await sendEmail(customer.email, subject, html);
+      const result = await sendEmail(
+        customer.email,
+        subject,
+        html,
+        automation.templateFromEmail,
+        automation.templateReplyTo
+      );
 
       if (result.success) {
         // Log the successful send to automation_tracker to prevent duplicate emails

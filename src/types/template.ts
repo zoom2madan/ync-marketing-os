@@ -10,6 +10,8 @@ export interface MessageTemplate {
   templatingType: TemplatingType;
   subject: string | null;
   message: string;
+  fromEmail: string | null;
+  replyTo: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,6 +23,8 @@ export interface CreateTemplateRequest {
   templatingType?: TemplatingType;
   subject?: string;
   message: string;
+  fromEmail?: string;
+  replyTo?: string;
 }
 
 export interface UpdateTemplateRequest {
@@ -29,6 +33,8 @@ export interface UpdateTemplateRequest {
   templatingType?: TemplatingType;
   subject?: string;
   message?: string;
+  fromEmail?: string;
+  replyTo?: string;
 }
 
 export interface TemplateSearchParams {

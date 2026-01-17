@@ -8,6 +8,7 @@ interface SendEmailOptions {
   subject: string;
   html: string;
   from?: string;
+  replyTo?: string;
 }
 
 interface SendEmailResult {
@@ -21,7 +22,7 @@ interface SendEmailResult {
  */
 export async function sendEmail(options: SendEmailOptions): Promise<SendEmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = options.from || process.env.RESEND_FROM_EMAIL || "noreply@example.com";
+  const fromEmail = options.from || "noreply@example.com";
 
   if (!apiKey) {
     console.error("RESEND_API_KEY environment variable is not set");
@@ -32,18 +33,25 @@ export async function sendEmail(options: SendEmailOptions): Promise<SendEmailRes
   }
 
   try {
+    const emailPayload: Record<string, string> = {
+      from: fromEmail,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+    };
+
+    // Add reply_to if provided
+    if (options.replyTo) {
+      emailPayload.reply_to = options.replyTo;
+    }
+
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        from: fromEmail,
-        to: options.to,
-        subject: options.subject,
-        html: options.html,
-      }),
+      body: JSON.stringify(emailPayload),
     });
 
     const data = await response.json();
